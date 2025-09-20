@@ -1,0 +1,22 @@
+# Core
+fastapi==0.116.2
+fastapi[standard]
+
+# ML / OCR
+easyocr==1.7.2
+numpy==2.3.3
+Pillow==11.3.0
+pytesseract==0.3.13
+
+# Document processing
+python-docx==1.2.0
+pymupdf==1.26.4
+
+# LLM client
+ollama==0.5.4
+
+# Torch (CPU by default; GPU optional)
+torch==2.8.0
+torchvision==0.23.0
+torchaudio==2.8.0
+# -f https://download.pytorch.org/whl/cu129
