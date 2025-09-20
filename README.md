@@ -49,14 +49,18 @@ cd D2Q
 
 ### 2. Create virtual environment & install dependencies
 
-If you want to use your GPU, make sure you have CUDA installed, and uncomment the last line in requirements.txt (`# -f https://download.pytorch.org/whl/cu129`)
-
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Linux/macOS
 .venv\Scripts\activate     # Windows
 
 pip install -r requirements.txt
+```
+
+If you want to use your GPU, make sure you have CUDA installed, and uncomment the last line in requirements.txt 
+
+```
+# -f https://download.pytorch.org/whl/cu129 <- Uncomment this
 ```
 
 ### 3. Run Ollama in Docker
