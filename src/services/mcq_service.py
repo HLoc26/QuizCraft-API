@@ -3,7 +3,7 @@ import json
 import re
 from typing import List
 from ollama import AsyncClient
-from constants.const import OLLAMA_URL, PROMPT_TEMPLATE
+from constants.const import OLLAMA_MODEL, OLLAMA_URL, PROMPT_TEMPLATE
 from schemas import MCQ
 from utils import TextHelper
 
@@ -22,7 +22,7 @@ class MCQService:
 
             # Try chat API
             try:
-                resp = await self.client.chat(model="llama3.2", messages=[{"role": "user", "content": prompt}], stream=False)
+                resp = await self.client.chat(model=OLLAMA_MODEL, messages=[{"role": "user", "content": prompt}], stream=False)
                 text_out = resp["message"]["content"]
             except Exception as e:
                 print(f"Chat API error chunk {idx}: {e}")
