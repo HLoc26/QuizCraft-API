@@ -8,8 +8,15 @@ services:
       - ./docker/ollama.entrypoint.sh:/entrypoint.sh
     ports:
       - "11434:11434"
+    environment:
+      - OLLAMA_USE_GPU=1
     restart: unless-stopped
     entrypoint: ["/bin/sh", "/entrypoint.sh"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
 
   backend:
     build:
@@ -27,6 +34,11 @@ services:
     volumes:
       - ./uploads:/uploads
       - ./src:/app/src
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
 
 volumes:
   ollama_data:
