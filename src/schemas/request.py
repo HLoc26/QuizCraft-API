@@ -9,11 +9,16 @@ class GenerateRequest(BaseModel):
     max_chunk_word: Optional[int] = 400
 
 
+class Answer(BaseModel):
+    index: int
+    text: str
+
+
 # Multiple choice questions
 class MCQ(BaseModel):
     question: str
     options: List[str]
-    answer: str
+    answer: Answer
     source_chunk_index: Optional[int] = None
 
 

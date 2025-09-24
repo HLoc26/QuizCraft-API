@@ -11,5 +11,5 @@ class MCQRouter:
 
     def register_routes(self):
         @self.router.post("/generate", response_model=GenerateResponse)
-        async def generate_mcq(req: GenerateRequest):
-            return await self.controller.generate(req)
+        async def generate_mcq(req: GenerateRequest, language):
+            return await self.controller.generate(req, language)

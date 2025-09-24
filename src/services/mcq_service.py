@@ -3,7 +3,7 @@ import json
 import re
 from typing import List
 from ollama import AsyncClient
-from constants.const import OLLAMA_MODEL, OLLAMA_URL, PROMPT_TEMPLATE
+from constants import OLLAMA_MODEL, OLLAMA_URL, MCQ_GEN_PROMPT
 from schemas import MCQ
 from utils import TextHelper
 
@@ -12,12 +12,13 @@ class MCQService:
     def __init__(self):
         self.client = AsyncClient(host=OLLAMA_URL)
 
-    async def generate_mcq(self, text: str, max_chunk_word: int, question_per_chunk: int) -> List[MCQ]:
+    async def generate_mcq(self, text: str, max_chunk_word: int, question_per_chunk: int, language: str) -> List[MCQ]:
         chunks = TextHelper.chunk_text_by_word(text, max_words=max_chunk_word)
+        print("chunks:", chunks)
         questions = []
 
         async def gen_for_chunk(idx, chunk):
-            prompt = PROMPT_TEMPLATE.format(context=chunk, n=question_per_chunk)
+            prompt = MCQ_GEN_PROMPT.format(context=chunk, n=question_per_chunk, language=language)
             text_out = None
 
             # Try chat API
