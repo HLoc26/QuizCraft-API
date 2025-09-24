@@ -12,42 +12,54 @@ class ScanService:
         self.UPLOAD_FOLDER: str = UPLOAD_FOLDER
         self.ocr_service = OCRService()
 
-    def get_path(self, filename):
+    def get_path(self, filename: str) -> str:
         return os.path.join(self.UPLOAD_FOLDER, filename)
 
-    async def scan_pdf(self, filename: str):
-        file_path: str = self.get_path(filename)
+    async def scan_pdf(self, file_or_path):
         text: str = ""
-        doc = pymupdf.open(file_path)
+
+        if isinstance(file_or_path, str):  # path
+            doc = pymupdf.open(self.get_path(file_or_path))
+        else:  # file-like object
+            # Đảm bảo seek về đầu
+            file_or_path.seek(0)
+            doc = pymupdf.open(stream=file_or_path.read(), filetype="pdf")
 
         for page in doc:
-            extracted = page.get_textbox("")
+            extracted = page.get_text("text")
             if extracted.strip():
                 text += extracted + "\n"
             else:
-                print("Using OCR due to extracted is", extracted)
                 pix = page.get_pixmap(dpi=300)
                 img = Image.open(io.BytesIO(pix.tobytes("png")))
                 ocr_text = await self.ocr_service.use_easyocr(img)
                 text += ocr_text + "\n"
         return text
 
-    async def scan_image(self, filename: str):
-        file_path: str = self.get_path(filename)
-        text: str = ""
-        text = await self.ocr_service.use_easyocr(file_path)
-        return text
+    async def scan_image(self, file_or_path):
+        if isinstance(file_or_path, str):
+            file_path = self.get_path(file_or_path)
+            return await self.ocr_service.use_easyocr(file_path)
+        else:
+            file_or_path.seek(0)
+            img = Image.open(file_or_path)
+            return await self.ocr_service.use_easyocr(img)
 
-    async def scan_text(self, filename: str):
-        file_path: str = self.get_path(filename)
-        text: str = ""
-        with open(file_path, "r", encoding="utf-8") as f:
-            text += f.read()
-        return text
+    async def scan_text(self, file_or_path):
+        if isinstance(file_or_path, str):
+            file_path = self.get_path(file_or_path)
+            with open(file_path, "r", encoding="utf-8") as f:
+                return f.read()
+        else:
+            file_or_path.seek(0)
+            return file_or_path.read().decode("utf-8")
 
-    async def scan_docx(self, filename: str):
-        file_path: str = self.get_path(filename)
-        text: str = ""
-        doc = docx.Document(file_path)
-        text = "\n".join([para.text for para in doc.paragraphs])
-        return text
+    async def scan_docx(self, file_or_path):
+        if isinstance(file_or_path, str):
+            file_path = self.get_path(file_or_path)
+            doc = docx.Document(file_path)
+        else:
+            file_or_path.seek(0)
+            doc = docx.Document(file_or_path)
+
+        return "\n".join([para.text for para in doc.paragraphs])
