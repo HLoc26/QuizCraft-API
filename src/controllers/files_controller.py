@@ -28,7 +28,7 @@ class FilesController:
             lower_name = filename.lower()
 
             if lower_name.endswith(".pdf"):
-                text = await self.scan_service.scan_pdf(filename)
+                text = await self.scan_service.scan_pdf_pages(filename)
 
             elif lower_name.endswith((".png", ".jpeg", ".jpg")):
                 text = await self.scan_service.scan_image(filename)
@@ -52,7 +52,7 @@ class FilesController:
             filename = file.filename.lower()
 
             if filename.endswith(".pdf"):
-                text = await self.scan_service.scan_pdf(file.file)
+                text = await self.scan_service.scan_pdf_pages(file.file)
 
             elif filename.endswith((".png", ".jpeg", ".jpg")):
                 text = await self.scan_service.scan_image(file.file)

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from controllers.mcq_controller import MCQController
-from schemas.request import GenerateRequest, GenerateResponse
+from schemas.schema import GenerateRequest
 
 
 class MCQRouter:
@@ -10,6 +10,6 @@ class MCQRouter:
         self.register_routes()
 
     def register_routes(self):
-        @self.router.post("/generate", response_model=GenerateResponse)
+        @self.router.post("/generate")
         async def generate_mcq(req: GenerateRequest, language):
             return await self.controller.generate(req, language)

@@ -1,63 +1,45 @@
 import asyncio
-import json
-import re
 from typing import List
-from ollama import AsyncClient
-from constants import OLLAMA_MODEL, OLLAMA_URL, MCQ_GEN_PROMPT
+from clients.ai_client import AIClient
+from constants import MCQ_GEN_PROMPT
+from constants.env import GENERATIVE_PROVIDER
+from constants.prompts import VALIDATE_PROMPT
 from schemas import MCQ
-from utils import TextHelper
+from schemas.schema import ChunkQuestionMapping
 
 
 class MCQService:
     def __init__(self):
-        self.client = AsyncClient(host=OLLAMA_URL)
+        # provider chọn từ .env
+        self.client = AIClient.get_instance(provider=GENERATIVE_PROVIDER)
 
-    async def generate_mcq(self, text: str, max_chunk_word: int, question_per_chunk: int, language: str) -> List[MCQ]:
-        chunks = TextHelper.chunk_text_by_word(text, max_words=max_chunk_word)
-        print("chunks:", chunks)
-        questions = []
+    async def generate_mcq(self, cleaned_and_chunked_texts: List[str], question_per_chunk: int, language: str) -> List[MCQ]:
+        questions: List[MCQ] = []
 
         async def gen_for_chunk(idx, chunk):
             prompt = MCQ_GEN_PROMPT.format(context=chunk, n=question_per_chunk, language=language)
-            text_out = None
-
-            # Try chat API
+            resp = None
             try:
-                resp = await self.client.chat(model=OLLAMA_MODEL, messages=[{"role": "user", "content": prompt}], stream=False)
-                text_out = resp["message"]["content"]
+                resp = await self.client.chat_structured(content=prompt, response_schema=list[MCQ])
+                # print(resp)
             except Exception as e:
                 print(f"Chat API error chunk {idx}: {e}")
-                try:
-                    resp = await self.client.generate(model="llama3.2", prompt=prompt)
-                    text_out = resp["response"]
-                except Exception as e2:
-                    print(f"Generate API error chunk {idx}: {e2}")
+                raise e
 
-            if not text_out:
+            if not resp:
                 return []
 
-            # Parse JSON
-            try:
-                data = json.loads(text_out)
-            except json.JSONDecodeError:
-                m = re.search(r"(\[.*\])", text_out, re.DOTALL)
-                if not m:
-                    return []
-                try:
-                    data = json.loads(m.group(1))
-                except json.JSONDecodeError:
-                    return []
-
-            out = []
-            for it in data:
-                mcq = {
-                    "question": it.get("question"),
-                    "options": it.get("options"),
-                    "answer": it.get("answer"),
-                    "source_chunk_index": idx,
-                }
-                if mcq["question"] and mcq["options"] and mcq["answer"]:
-                    out.append(mcq)
+            out: List[MCQ] = []
+            for it in resp:
+                if it.question and it.options and it.answer:
+                    out.append(
+                        MCQ(
+                            question=it.question,
+                            options=it.options,
+                            answer=it.answer,
+                            source_chunk_index=idx,
+                        )
+                    )
             return out
 
         sem = asyncio.Semaphore(3)
@@ -66,8 +48,70 @@ class MCQService:
             async with sem:
                 return await gen_for_chunk(i, c)
 
-        results = await asyncio.gather(*[sem_task(i, c) for i, c in enumerate(chunks)])
+        results = await asyncio.gather(*[sem_task(i, c) for i, c in enumerate(cleaned_and_chunked_texts)])
         for r in results:
             questions.extend(r)
 
         return questions
+
+    async def validate_mcq(self, cleaned_and_chunked_texts: List[str], questions: List[MCQ]):
+        # Group theo chunk
+        questions.sort(key=lambda q: q.source_chunk_index)
+        chunks: List[ChunkQuestionMapping] = []
+        selected: List[MCQ] = []
+
+        for q in questions:
+            if not selected:
+                selected.append(q)
+                continue
+            if q.source_chunk_index != selected[-1].source_chunk_index:
+                chunks.append(
+                    ChunkQuestionMapping(
+                        chunk_index=selected[-1].source_chunk_index,
+                        chunk_text=cleaned_and_chunked_texts[selected[-1].source_chunk_index],
+                        questions=selected,
+                    )
+                )
+                selected = [q]
+            else:
+                selected.append(q)
+        if selected:
+            chunks.append(
+                ChunkQuestionMapping(
+                    chunk_index=selected[-1].source_chunk_index,
+                    chunk_text=cleaned_and_chunked_texts[selected[-1].source_chunk_index],
+                    questions=selected,
+                )
+            )
+
+        async def validate_chunk(chunk: ChunkQuestionMapping):
+            prompt = VALIDATE_PROMPT.format(
+                chunk_text=chunk.chunk_text,
+                questions=[q.model_dump() for q in chunk.questions],
+            )
+            try:
+                resp = await self.client.chat_structured(prompt, response_schema=list[MCQ])
+            except Exception as e:
+                print(f"[validate_chunk] Error: {e}")
+                raise e
+
+            if not resp:
+                return []
+
+            out: List[MCQ] = []
+            for it in resp:
+                if it.question and it.options and it.answer:
+                    out.append(
+                        MCQ(
+                            question=it.question,
+                            options=it.options,
+                            answer=it.answer,
+                            source_chunk_index=it.source_chunk_index,
+                        )
+                    )
+            return out
+
+        results = await asyncio.gather(*(validate_chunk(c) for c in chunks))
+        validated_questions: List[MCQ] = [q for chunk_result in results for q in chunk_result]
+
+        return validated_questions

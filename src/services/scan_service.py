@@ -15,6 +15,25 @@ class ScanService:
     def get_path(self, filename: str) -> str:
         return os.path.join(self.UPLOAD_FOLDER, filename)
 
+    async def scan_pdf_pages(self, file_or_path):
+        results = []
+        if isinstance(file_or_path, str):
+            doc = pymupdf.open(self.get_path(file_or_path))
+        else:
+            file_or_path.seek(0)
+            doc = pymupdf.open(stream=file_or_path.read(), filetype="pdf")
+
+        for i, page in enumerate(doc, start=1):
+            extracted = page.get_text("text")
+            if extracted.strip():
+                text = extracted
+            else:
+                pix = page.get_pixmap(dpi=300)
+                img = Image.open(io.BytesIO(pix.tobytes("png")))
+                text = await self.ocr_service.use_easyocr(img)
+            results.append({"page": i, "text": text})
+        return results
+
     async def scan_pdf(self, file_or_path):
         text: str = ""
 

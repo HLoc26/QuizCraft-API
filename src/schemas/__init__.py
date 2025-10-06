@@ -1,3 +1,3 @@
-from .request import GenerateRequest, GenerateResponse, MCQ
+from .schema import GenerateRequest, GenerateResponse, MCQ
 
 __all__ = ["GenerateRequest", "GenerateResponse", "MCQ"]

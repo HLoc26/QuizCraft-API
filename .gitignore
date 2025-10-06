@@ -5,6 +5,8 @@ uploads/**
 !uploads/Welcome.md
 !uploads/Welcome.vi.md
 
+.env
+
 # Created by https://www.toptal.com/developers/gitignore/api/pythonvanilla,visualstudiocode,venv
 # Edit at https://www.toptal.com/developers/gitignore?templates=pythonvanilla,visualstudiocode,venv
 
