@@ -1,8 +1,9 @@
 #!/bin/sh
 set -e
 
-# Start server
-exec ollama serve
+if ! ollama list | grep -q "llama3.2"; then
+  echo "Model llama3.2 not found. Pulling..."
+  ollama pull llama3.2
+fi
 
-# Pull model: llama3.2
-ollama pull llama3.2
+exec ollama serve

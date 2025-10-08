@@ -60,6 +60,7 @@ Output Format:
 ]
 
 Constraints:
+- Do not return any text or code block other than the JSON array,
 - Each "question" must be either:
   1. A clear question ending with "?", OR
   2. A fill-in-the-blank with exactly one blank "____".

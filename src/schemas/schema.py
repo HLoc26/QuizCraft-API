@@ -1,6 +1,23 @@
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any
 from pydantic import BaseModel
-from typing import Dict
+
+
+# Request for /clean
+class CleanRequest(BaseModel):
+    chunks: List[str]
+
+
+# Request for /generate
+class GenerateMCQRequest(BaseModel):
+    cleaned_chunks: List[str]
+    question_per_chunk: int = 2
+    language: str = "vi"
+
+
+# Request for /validate
+class ValidateMCQRequest(BaseModel):
+    cleaned_chunks: List[str]
+    questions: List[Any]  # hoặc có thể dùng List[MCQ] nếu chắc chắn
 
 
 class PagedText(BaseModel):

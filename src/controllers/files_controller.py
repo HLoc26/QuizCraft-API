@@ -66,6 +66,6 @@ class FilesController:
             else:
                 return ResponseHelper.error("Unsupported file type.")
 
-            return ResponseHelper.success({"filename": file.filename, "text": text})
+            return ResponseHelper.success({"filename": file.filename, "pages": text})
         except Exception as e:
             return ResponseHelper.error(str(e))

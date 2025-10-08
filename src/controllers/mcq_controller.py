@@ -1,5 +1,4 @@
-import asyncio
-from typing import Literal, Self
+from typing import Literal
 from fastapi import HTTPException
 from schemas.schema import GenerateRequest
 from services import MCQService
@@ -13,55 +12,30 @@ class MCQController:
         self.mcq_service = MCQService()
         self.text_processing_service = TextProcessingService()
 
-    async def generate(self: Self, req: GenerateRequest, language: Literal["en", "vi"]):
+    async def chunk(self, req: GenerateRequest):
         input_text = req.text
-        # print(input_text)
-        # Step 2: detect and delete headers, footers, page numbers
+        # Bước 1: Xử lý header/footer
         pages = self.text_processing_service.remove_headers(input_text)
-        # pages = input_text
-
-        # Step 3: Chunk by tokens
-        print("Splitting into chunks")
+        # Bước 2: Chunk
         chunks = self.text_processing_service.chunk_by_token(pages)
-        print("Splitted into ", len(chunks), "chunks")
+        return ResponseHelper.success(data={"num_chunks": len(chunks), "chunks": chunks})
 
-        with open("chunks.txt", "w", encoding="utf-8") as f:
-            f.write("\n\n".join(chunks))
+    async def clean(self, chunks: list[str]):
+        # Bước 3: Clean từng chunk (có thể async nếu clean_text là async)
+        # cleaned_chunks = await asyncio.gather(*[self.text_processing_service.clean_text(chunk) for chunk in chunks])
+        cleaned_chunks = chunks  # Nếu chưa có clean thực sự
+        return ResponseHelper.success(data={"success": True, "cleaned_chunks": cleaned_chunks})
 
-        print("Min chunk length:", len(min(chunks, key=lambda x: len(x))))
-        print("Max chunk length:", len(max(chunks, key=lambda x: len(x))))
-
-        # Step 4: Clean texts
-        # print("Cleaning text")
-        # cleaned_texts = await asyncio.gather(*[self.text_processing_service.clean_text(chunk) for chunk in chunks])
-        # print("Text cleaned")
-        cleaned_texts = chunks
-
-        # return ResponseHelper.success(
-        #     data={
-        #         "questions": {
-        #             "question": "Miếu hiệu của Khúc Thừa Dụ là gì?",
-        #             "options": ["Tiên Chủ", "Trung Chủ", "Hậu Chủ", "Tĩnh Hải Quân Tiết độ sứ"],
-        #             "answer": {"index": 0, "text": "Tiên Chủ"},
-        #             "source_chunk_index": 0,
-        #         },
-        #     }
-        # )
-
-        if not cleaned_texts:
+    async def generate(self, cleaned_chunks: list[str], question_per_chunk: int, language: Literal["en", "vi"]):
+        if not cleaned_chunks:
             raise HTTPException(status_code=400, detail="Empty text")
-
         questions = await self.mcq_service.generate_mcq(
-            cleaned_and_chunked_texts=cleaned_texts,  #
-            question_per_chunk=req.question_per_chunk,
+            cleaned_and_chunked_texts=cleaned_chunks,
+            question_per_chunk=question_per_chunk,
             language=LanguageMapping.map(language),
         )
+        return ResponseHelper.success(data={"questions": questions})
 
-        print(questions)
-
-        questions_validated = await self.mcq_service.validate_mcq(cleaned_texts, questions)
-
-        if len(questions_validated) < len(questions):
-            print("Deleted", len(questions) - len(questions_validated), "questions")
-
+    async def validate(self, cleaned_chunks: list[str], questions: list):
+        questions_validated = await self.mcq_service.validate_mcq(cleaned_chunks, questions)
         return ResponseHelper.success(data={"questions": questions_validated})

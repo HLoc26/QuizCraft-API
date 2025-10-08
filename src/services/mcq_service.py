@@ -31,12 +31,17 @@ class MCQService:
 
             out: List[MCQ] = []
             for it in resp:
-                if it.question and it.options and it.answer:
+                # Hỗ trợ cả dạng object (Gemini) và dict (Local)
+                q = it.get("question") if isinstance(it, dict) else getattr(it, "question", None)
+                opts = it.get("options") if isinstance(it, dict) else getattr(it, "options", None)
+                ans = it.get("answer") if isinstance(it, dict) else getattr(it, "answer", None)
+
+                if q and opts and ans:
                     out.append(
                         MCQ(
-                            question=it.question,
-                            options=it.options,
-                            answer=it.answer,
+                            question=q,
+                            options=opts,
+                            answer=ans,
                             source_chunk_index=idx,
                         )
                     )
@@ -100,13 +105,18 @@ class MCQService:
 
             out: List[MCQ] = []
             for it in resp:
-                if it.question and it.options and it.answer:
+                # Hỗ trợ cả dạng object (Gemini) và dict (Local)
+                q = it.get("question") if isinstance(it, dict) else getattr(it, "question", None)
+                opts = it.get("options") if isinstance(it, dict) else getattr(it, "options", None)
+                ans = it.get("answer") if isinstance(it, dict) else getattr(it, "answer", None)
+
+                if q and opts and ans:
                     out.append(
                         MCQ(
-                            question=it.question,
-                            options=it.options,
-                            answer=it.answer,
-                            source_chunk_index=it.source_chunk_index,
+                            question=q,
+                            options=opts,
+                            answer=ans,
+                            source_chunk_index=chunk.chunk_index,
                         )
                     )
             return out
