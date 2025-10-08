@@ -43,8 +43,8 @@ src/
 
 ### 1. Clone repo
 ```bash
-git clone https://github.com/hloc26/QuizCraft.git
-cd QuizCraft
+git clone https://github.com/hloc26/QuizCraft-API.git
+cd QuizCraft-API
 ````
 
 ### 2. Create virtual environment & install dependencies
