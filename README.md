@@ -1,4 +1,4 @@
-# 📘 QuizCraft – AI-Powered Self Learning
+# QuizCraft – AI-Powered Self Learning
 
 > This is the API repository. Check [QuizCraft-UI](https://github.com/HLoc26/QuizCraft-UI) for UI
 
@@ -11,7 +11,7 @@ This project allows users to **upload documents (PDF, DOCX, images, scans)** →
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Backend**: [FastAPI](https://fastapi.tiangolo.com/)  
 - **AI/LLM**: [Ollama](https://ollama.ai/) (running in Docker, model `llama3.2`)  
@@ -21,7 +21,7 @@ This project allows users to **upload documents (PDF, DOCX, images, scans)** →
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 
@@ -42,7 +42,7 @@ src/
 
 ---
 
-## ⚙️ Setup
+## Setup
 
 ### 1. Clone repo
 ```bash
@@ -83,24 +83,33 @@ Open [http://localhost:8000/docs](http://localhost:8000/docs) to test the API.
 
 ---
 
-## 📡 API Endpoints
+## API Endpoints
 
-### Upload + OCR
 
-```http
-POST /upload
+### `POST /upload`
+**Description:** Upload a file (PDF, DOCX, image, TXT) to the server. Automatically performs OCR if needed and extracts text.
+
+**Request:**
+- `multipart/form-data` with file field named `file`
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "filename": "G.W.txt",
+    "text": "Extracted text from file..."
+  },
+  "error": null
+}
 ```
 
-* Accepts PDF/DOCX/IMG/TXT files, stores them on the server, and extracts text.
+---
 
-### Generate MCQs
+### `POST /mcq/generate`
+**Description:** Generate multiple-choice questions (MCQs) from provided text using LLM (Llama3.2).
 
-```http
-POST /mcq/generate
-```
-
-Request body:
-
+**Request:**
 ```json
 {
   "text": "Some content to generate questions from",
@@ -109,32 +118,102 @@ Request body:
 }
 ```
 
-Response:
-
+**Response:**
 ```json
 {
-  "questions": [
-    {
-      "question": "When was George Washington born?",
-      "options": ["February 22", "December 22", "February 12", "February 15"],
-      "answer": "February 22",
-      "source_chunk_index": 0
-    }
-  ]
+  "success": true,
+  "data": {
+    "questions": [
+      {
+        "question": "When was George Washington born?",
+        "options": ["February 22", "December 22", "February 12", "February 15"],
+        "answer": "February 22",
+        "source_chunk_index": 0
+      }
+    ]
+  },
+  "error": null
 }
 ```
 
 ---
 
-## 📝 Roadmap
+### `GET /files/list`
+**Description:** List all uploaded files available on the server.
 
-* [ ] Add language selection (English / Vietnamese).
-* [ ] Improve distractor (wrong answers) generation.
-* [ ] Add frontend UI for quizzes.
-* [ ] Support more LLMs (Mistral, Gemma, etc).
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    "G.W.txt",
+    "Welcome.md"
+  ],
+  "error": null
+}
+```
 
 ---
 
-## 📜 License
+### `GET /files/text?filename=...`
+**Description:** Get the extracted text content of a specific uploaded file.
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "filename": "G.W.txt",
+    "text": "Extracted text from file..."
+  },
+  "error": null
+}
+```
+
+---
+
+### `POST /mcq/scan`
+**Description:** Upload a scan/image and generate MCQs directly from the scanned content (OCR + MCQ in one step).
+
+**Request:**
+- `multipart/form-data` with file field named `file`
+- Optional JSON body for MCQ parameters
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "questions": [ ... ]
+  },
+  "error": null
+}
+```
+
+---
+
+### Error Response Format
+All endpoints return errors in a consistent format:
+```json
+{
+  "success": false,
+  "data": null,
+  "error": "Error message here"
+}
+```
+
+---
+
+## Roadmap
+
+* [x] Add language selection (English / Vietnamese).
+* [ ] Improve distractor (wrong answers) generation.
+* [ ] Improve questions quality.
+* [x] Add frontend UI for quizzes.
+* [x] Support more LLMs (Mistral, Gemma, etc).
+
+---
+
+## License
 
 MIT License. Free for personal & educational use.
