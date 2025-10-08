@@ -1,5 +1,8 @@
 # 📘 QuizCraft – AI-Powered Self Learning
 
+> This is the API repository. Check [QuizCraft-UI](https://github.com/HLoc26/QuizCraft-UI) for UI
+
+
 This project allows users to **upload documents (PDF, DOCX, images, scans)** → the system will:  
 1. **OCR / Extract text** (if the file is an image or scanned PDF).  
 2. **Split text into chunks**.  
