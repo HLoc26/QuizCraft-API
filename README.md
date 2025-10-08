@@ -1,4 +1,4 @@
-# 📘 Doc2Quiz – AI-Powered Self Learning
+# 📘 QuizCraft – AI-Powered Self Learning
 
 This project allows users to **upload documents (PDF, DOCX, images, scans)** → the system will:  
 1. **OCR / Extract text** (if the file is an image or scanned PDF).  
@@ -43,8 +43,8 @@ src/
 
 ### 1. Clone repo
 ```bash
-git clone https://github.com/hloc26/D2Q.git
-cd D2Q
+git clone https://github.com/hloc26/QuizCraft.git
+cd QuizCraft
 ````
 
 ### 2. Create virtual environment & install dependencies
