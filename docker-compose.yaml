@@ -18,7 +18,7 @@ services:
           devices:
             - capabilities: [gpu]
 
-  backend:
+  quizcraft-api:
     build:
       context: .
       dockerfile: docker/fastapi.dockerfile

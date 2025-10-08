@@ -1,9 +1,12 @@
 #!/bin/sh
 set -e
 
-if ! ollama list | grep -q "llama3.2"; then
-  echo "Model llama3.2 not found. Pulling..."
-  ollama pull llama3.2
-fi
+# Khởi động ollama serve trong nền
+ollama serve &
+sleep 5  # chờ server khởi động ổn định (tùy máy, có thể tăng)
 
-exec ollama serve
+# Pull model
+ollama pull llama3.2 || true
+
+# Giữ tiến trình foreground để container không thoát
+wait
