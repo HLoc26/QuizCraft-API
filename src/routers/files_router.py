@@ -1,6 +1,6 @@
 from fastapi import APIRouter, File, UploadFile
 
-from controllers import FilesController
+from ..controllers import FilesController
 
 
 # Prefix: /files

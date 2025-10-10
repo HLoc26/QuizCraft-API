@@ -1,10 +1,9 @@
 from typing import List
 import re
-from clients.ai_client import AIClient
-from constants.env import GENERATIVE_PROVIDER
-from constants.prompts import CLEANER_PROMPT
-from schemas.schema import PagedText
-from utils.text_helper import TextHelper
+from ..clients import AIClient
+from ..constants import GENERATIVE_PROVIDER, CLEANER_PROMPT
+from ..schemas import PagedText
+from ..utils import TextHelper
 
 
 class TextProcessingService:

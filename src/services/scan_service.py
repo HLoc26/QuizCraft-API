@@ -2,7 +2,7 @@ import io
 import os
 import docx
 import pymupdf
-from constants import UPLOAD_FOLDER
+from ..constants import UPLOAD_FOLDER
 from .ocr_service import OCRService
 from PIL import Image
 

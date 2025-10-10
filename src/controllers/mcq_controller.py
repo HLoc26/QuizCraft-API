@@ -1,10 +1,8 @@
 from typing import Literal
 from fastapi import HTTPException
-from schemas.schema import GenerateRequest
-from services import MCQService
-from services.text_process_service import TextProcessingService
-from utils.language_mapping import LanguageMapping
-from utils.response_helper import ResponseHelper
+from ..schemas import GenerateRequest
+from ..services import MCQService, TextProcessingService
+from ..utils import LanguageMapping, ResponseHelper
 
 
 class MCQController:

@@ -1,7 +1,7 @@
 from fastapi import UploadFile, File
-from utils import ResponseHelper
-from constants import UPLOAD_FOLDER
-from services import ScanService, UploadService
+from ..utils import ResponseHelper
+from ..constants import UPLOAD_FOLDER
+from ..services import ScanService, UploadService
 import os
 
 

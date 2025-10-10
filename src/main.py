@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .clients import AIClient
-from utils import ResponseHelper
-from routers import FilesRouter, MCQRouter
+from .utils import ResponseHelper
+from .routers import FilesRouter, MCQRouter
 
 
 app = FastAPI()

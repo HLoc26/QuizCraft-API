@@ -1,11 +1,8 @@
 import asyncio
 from typing import List
-from clients.ai_client import AIClient
-from constants import MCQ_GEN_PROMPT
-from constants.env import GENERATIVE_PROVIDER
-from constants.prompts import VALIDATE_PROMPT
-from schemas import MCQ
-from schemas.schema import ChunkQuestionMapping
+from ..clients.ai_client import AIClient
+from ..constants import MCQ_GEN_PROMPT, GENERATIVE_PROVIDER, VALIDATE_PROMPT
+from ..schemas import MCQ, ChunkQuestionMapping
 
 
 class MCQService:

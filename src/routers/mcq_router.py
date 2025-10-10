@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from controllers.mcq_controller import MCQController
-from schemas.schema import CleanRequest, GenerateRequest, GenerateMCQRequest, ValidateMCQRequest
+from ..controllers import MCQController
+from ..schemas import CleanRequest, GenerateRequest, GenerateMCQRequest, ValidateMCQRequest
 
 
 class MCQRouter:
