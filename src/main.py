@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from clients.ai_client import AIClient
+from .clients import AIClient
 from utils import ResponseHelper
 from routers import FilesRouter, MCQRouter
 

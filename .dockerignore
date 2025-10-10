@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+*.pyo
+*.db
+.env
+.git/
+.gitignore
+*.log
+.vscode/
+__venv__/
+.venv/
+data/
+models/
+ollama/
+uploads/

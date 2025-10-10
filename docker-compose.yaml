@@ -30,15 +30,18 @@ services:
     environment:
       - OLLAMA_URL=http://ollama:11434
       - OLLAMA_MODEL=llama3.2
+      - PYTHONPATH="src"
+    env_file:
+      - .env
     restart: on-failure
     volumes:
       - ./uploads:/uploads
       - ./src:/app/src
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: [gpu]
 
 volumes:
   ollama_data:

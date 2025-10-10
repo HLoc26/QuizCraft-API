@@ -1,7 +1,7 @@
 import json
 import re
 from typing import List, Dict, Literal, Any
-from constants.env import GEMINI_API_KEY, GEMINI_MODEL, OLLAMA_MODEL, OLLAMA_URL
+from ..constants import GEMINI_API_KEY, GEMINI_MODEL, OLLAMA_MODEL, OLLAMA_URL
 
 
 class AIClient:
